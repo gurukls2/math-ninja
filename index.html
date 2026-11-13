@@ -1,0 +1,2200 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Ninja - Matematika Kelas 2 SD</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Fredoka & Press Start 2P untuk nuansa Retro Arcade Ramah Anak -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
+    
+    <!-- MediaPipe Hands CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --arcade-bg: #1a103c;
+            --arcade-card: #271856;
+            --arcade-yellow: #ffd60a;
+            --arcade-orange: #ff7b00;
+            --arcade-green: #06d6a0;
+            --arcade-red: #ef476f;
+            --arcade-cyan: #00bbf9;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: radial-gradient(circle at top, #2e1a66 0%, #140b30 100%);
+            color: #ffffff;
+            overflow: hidden;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        .font-arcade {
+            font-family: 'Press Start 2P', cursive;
+        }
+
+        /* Tombol 3D Arcade */
+        .btn-arcade {
+            transition: all 0.12s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 6px 0 rgba(0, 0, 0, 0.45), 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        .btn-arcade:hover:not(:disabled) {
+            transform: translateY(-2px) scale(1.02);
+            filter: brightness(1.06);
+        }
+        .btn-arcade:active:not(:disabled) {
+            transform: translateY(4px) scale(0.98);
+            box-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+        }
+
+        .btn-yellow {
+            background: linear-gradient(180deg, #ffe64d 0%, #ffbe0b 100%);
+            border: 3px solid #fff3b0;
+            color: #3d1e00;
+            box-shadow: 0 7px 0 #b87a00, 0 12px 24px rgba(255, 190, 11, 0.4);
+        }
+        .btn-yellow:active:not(:disabled) {
+            box-shadow: 0 2px 0 #b87a00;
+        }
+
+        /* Animasi melayang lembut untuk logo */
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px) rotate(-1deg); }
+            50% { transform: translateY(-8px) rotate(1deg); }
+        }
+        .animate-float {
+            animation: floatSlow 3.2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 214, 10, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(255, 214, 10, 0.9); }
+        }
+        .glow-yellow {
+            animation: pulseGlow 2s infinite;
+        }
+
+        /* Custom Scrollbar untuk Modal */
+        .custom-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #ffd60a;
+            border-radius: 10px;
+        }
+
+        /* Mirror video preview kamera */
+        #webcam-video {
+            transform: scaleX(-1);
+        }
+
+        /* Pattern latar papan dapur ninja */
+        .dojo-grid {
+            background-image: 
+                radial-gradient(rgba(255, 255, 255, 0.06) 2px, transparent 2px),
+                radial-gradient(rgba(255, 214, 10, 0.04) 2px, transparent 2px);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+        }
+
+        /* Latar Talenan Kayu Coklat untuk Area Pengerjaan Soal */
+        .wooden-board-bg {
+            background-color: #7c4722;
+            background-image:
+                radial-gradient(circle at center, rgba(255, 232, 198, 0.14) 0%, rgba(43, 21, 7, 0.55) 100%),
+                repeating-linear-gradient(
+                    90deg,
+                    rgba(59, 30, 10, 0.16) 0px,
+                    rgba(59, 30, 10, 0.16) 2px,
+                    transparent 2px,
+                    transparent 96px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(255, 215, 170, 0.04) 0px,
+                    rgba(255, 215, 170, 0.04) 3px,
+                    rgba(46, 22, 6, 0.07) 3px,
+                    rgba(46, 22, 6, 0.07) 7px
+                );
+            box-shadow: inset 0 0 0 10px #4a260e, inset 0 0 36px rgba(24, 10, 2, 0.75);
+        }
+    </style>
+</head>
+<body class="w-screen h-screen flex flex-col dojo-grid">
+
+    <!-- ==================== NAVBAR ATAS ==================== -->
+    <header id="top-navbar" class="w-full bg-[#180d38]/95 border-b-4 border-[#3c2485] px-3 py-2 sm:px-6 sm:py-2.5 flex items-center justify-between z-30 shadow-lg shrink-0">
+        <!-- Identitas Chef & Sekolah -->
+        <div class="flex items-center gap-2 sm:gap-3">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-2xl shadow-md border-2 border-yellow-200">
+                👨‍🍳
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <span class="text-xs uppercase tracking-wider text-amber-300 font-bold">Chef:</span>
+                    <span id="nav-student-name" class="text-sm sm:text-base font-bold text-white bg-indigo-900/90 px-2.5 py-0.5 rounded-xl border border-indigo-500/50 truncate max-w-[130px] sm:max-w-[200px]">
+                        Chef Cilik
+                    </span>
+                </div>
+                <p class="text-[11px] sm:text-xs text-indigo-200 hidden sm:block">Matematika Kelas 2 • Penjumlahan & Pengurangan 1–100</p>
+            </div>
+        </div>
+
+        <!-- Status HUD Saat Bermain (Tersembunyi di Menu Utama) -->
+        <div id="game-hud" class="hidden flex items-center gap-2 sm:gap-4">
+            <!-- Progres Misi & Soal -->
+            <div class="bg-[#271856] border-2 border-cyan-400/60 px-2.5 py-1 rounded-2xl text-center">
+                <div class="text-[10px] text-cyan-300 font-bold uppercase">Misi & Soal</div>
+                <div id="hud-progress" class="text-xs sm:text-sm font-bold text-white">M1 • 1/10</div>
+            </div>
+
+            <!-- Nyawa -->
+            <div class="bg-[#271856] border-2 border-rose-400/60 px-2.5 py-1 rounded-2xl text-center">
+                <div class="text-[10px] text-rose-300 font-bold uppercase">Nyawa</div>
+                <div id="hud-lives" class="text-xs sm:text-sm tracking-tight">❤️❤️❤️</div>
+            </div>
+
+            <!-- Skor & Multiplier -->
+            <div class="bg-[#271856] border-2 border-amber-400/70 px-3 py-1 rounded-2xl text-center relative">
+                <div class="text-[10px] text-amber-300 font-bold uppercase flex items-center justify-center gap-1">
+                    Skor <span id="hud-multiplier" class="hidden bg-emerald-400 text-slate-950 text-[10px] px-1.5 rounded-full font-extrabold animate-bounce">2X</span>
+                </div>
+                <div id="hud-score" class="font-arcade text-xs sm:text-sm text-yellow-300 mt-0.5">0</div>
+            </div>
+
+            <!-- Waktu -->
+            <div class="bg-[#271856] border-2 border-purple-400/60 px-2.5 py-1 rounded-2xl text-center hidden md:block">
+                <div class="text-[10px] text-purple-300 font-bold uppercase">Waktu</div>
+                <div id="hud-timer" class="text-xs sm:text-sm font-bold text-white">00:00</div>
+            </div>
+        </div>
+
+        <!-- Tombol Kanan Navbar (Suara & Menu) -->
+        <div class="flex items-center gap-2">
+            <button id="btn-toggle-sound" onclick="toggleSound()" title="Suara Efek" class="btn-arcade bg-indigo-700 hover:bg-indigo-600 border-2 border-indigo-400 w-10 h-10 rounded-2xl flex items-center justify-center text-lg">
+                🔊
+            </button>
+            <button id="btn-nav-home" onclick="confirmReturnHome()" class="hidden btn-arcade bg-rose-600 hover:bg-rose-500 border-2 border-rose-300 px-3 py-2 rounded-2xl text-xs sm:text-sm font-bold flex items-center gap-1">
+                🏠 <span class="hidden sm:inline">Menu</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ==================== AREA KONTEN UTAMA ==================== -->
+    <main class="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center">
+
+        <!-- 1. LAYAR MAIN MENU -->
+        <section id="screen-menu" class="w-full h-full overflow-y-auto custom-scroll flex flex-col items-center justify-center p-4 z-20">
+            <div class="max-w-2xl w-full bg-[#241452]/95 border-4 border-[#4d32a8] rounded-3xl p-5 sm:p-7 shadow-2xl text-center relative">
+                
+                <!-- Badge Kelas -->
+                <div class="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 font-extrabold text-xs sm:text-sm px-4 py-1 rounded-full mb-3 shadow-md">
+                    <span>🎯 MATEMATIKA KELAS 2 SD</span>
+                    <span>•</span>
+                    <span>BILANGAN 1–100</span>
+                </div>
+
+                <!-- Judul Game -->
+                <div class="animate-float mb-4">
+                    <h1 class="font-arcade text-2xl sm:text-4xl md:text-5xl text-transparent bg-clip-text bg-gradient-to-b from-yellow-200 via-amber-400 to-orange-500 drop-shadow-[0_5px_0_rgba(88,28,135,1)] leading-tight">
+                        MATH NINJA
+                    </h1>
+                    <p class="text-indigo-200 text-sm sm:text-base mt-2 font-semibold">
+                        Jadilah Chef Hebat! Potong Buah Berisi Jawaban Matematika yang Tepat! 🍉🍍🍎🥝
+                    </p>
+                </div>
+
+                <!-- Input Nama Siswa -->
+                <div class="bg-[#180d38] border-2 border-indigo-500/60 rounded-2xl p-3.5 sm:p-4 mb-4 text-left">
+                    <label for="input-student-name" class="block text-xs sm:text-sm font-bold text-amber-300 mb-1.5">
+                        👨‍🍳 Masukkan Nama Siswa (Chef):
+                    </label>
+                    <input type="text" id="input-student-name" maxlength="22" placeholder="Ketik namamu di sini, contoh: Budi..." 
+                        class="w-full bg-[#2c1b63] border-2 border-indigo-400 focus:border-yellow-400 focus:outline-none rounded-xl px-4 py-2.5 text-white font-bold text-base sm:text-lg placeholder-indigo-300/60 transition">
+                </div>
+
+                <!-- Pilihan Kontrol: Gesture Kamera vs Mouse/Sentuh -->
+                <div class="bg-[#180d38] border-2 border-indigo-500/60 rounded-2xl p-3.5 sm:p-4 mb-5 text-left">
+                    <div class="text-xs sm:text-sm font-bold text-cyan-300 mb-2">
+                        🎮 Pilih Mode Kontrol Pedang Chef:
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <button type="button" id="mode-camera-btn" onclick="selectControlMode('camera')" 
+                            class="flex items-center gap-3 p-3 rounded-2xl border-3 transition text-left bg-indigo-900/60 border-indigo-500/50 hover:border-cyan-400">
+                            <span class="text-2xl">📷</span>
+                            <div>
+                                <div class="font-bold text-sm text-white">Gesture Kamera</div>
+                                <div class="text-[11px] text-indigo-200">Telunjuk / Telapak Tangan</div>
+                            </div>
+                        </button>
+                        <button type="button" id="mode-pointer-btn" onclick="selectControlMode('pointer')" 
+                            class="flex items-center gap-3 p-3 rounded-2xl border-3 transition text-left bg-cyan-600/30 border-cyan-400 shadow-md">
+                            <span class="text-2xl">🖱️</span>
+                            <div>
+                                <div class="font-bold text-sm text-white">Mouse / Layar Sentuh</div>
+                                <div class="text-[11px] text-cyan-200">Geser Kursor / Jari / Keyboard</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tombol MULAI Utama Berwarna Kuning di Tengah -->
+                <div class="flex justify-center mb-5">
+                    <button id="btn-start-main" onclick="goToMissionMap()" 
+                        class="btn-arcade btn-yellow glow-yellow w-full sm:w-3/4 py-4 px-8 rounded-3xl font-arcade text-lg sm:text-2xl tracking-wider flex items-center justify-center gap-3">
+                        <span>⚔️</span>
+                        <span>MULAI</span>
+                    </button>
+                </div>
+
+                <!-- 3 Tombol Navigasi Pendukung (Cara Bermain, Tujuan Pembelajaran, Papan Skor) -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 sm:gap-3">
+                    <button onclick="openModal('modal-howto')" class="btn-arcade bg-gradient-to-b from-sky-400 to-blue-600 border-2 border-sky-200 py-3 px-3 rounded-2xl font-bold text-xs sm:text-sm text-white flex items-center justify-center gap-2">
+                        <span>📖</span> Cara Bermain
+                    </button>
+                    <button onclick="openModal('modal-objectives')" class="btn-arcade bg-gradient-to-b from-emerald-400 to-teal-600 border-2 border-emerald-200 py-3 px-3 rounded-2xl font-bold text-xs sm:text-sm text-slate-950 flex items-center justify-center gap-2">
+                        <span>🎯</span> Tujuan & Materi
+                    </button>
+                    <button onclick="openLeaderboard()" class="btn-arcade bg-gradient-to-b from-fuchsia-500 to-purple-700 border-2 border-fuchsia-200 py-3 px-3 rounded-2xl font-bold text-xs sm:text-sm text-white flex items-center justify-center gap-2">
+                        <span>🏆</span> Papan Skor
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. LAYAR PETA MISI (5 MISI, 50 SOAL) -->
+        <section id="screen-missions" class="hidden w-full h-full overflow-y-auto custom-scroll flex flex-col items-center justify-center p-4 z-20">
+            <div class="max-w-4xl w-full bg-[#241452]/95 border-4 border-[#4d32a8] rounded-3xl p-5 sm:p-7 shadow-2xl">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-5 border-b-2 border-indigo-700 pb-4">
+                    <div>
+                        <h2 class="font-arcade text-lg sm:text-2xl text-yellow-300">🗺️ PETA MISI CHEF</h2>
+                        <p class="text-xs sm:text-sm text-indigo-200 mt-1">
+                            Selesaikan setiap misi (10 soal/misi) secara berurutan untuk membuka misi berikutnya!
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span id="mission-control-badge" class="bg-indigo-900 border border-cyan-400 text-cyan-200 text-xs font-bold px-3 py-1.5 rounded-xl">
+                            Mode: Mouse/Sentuh
+                        </span>
+                        <button onclick="showScreen('screen-menu')" class="btn-arcade bg-slate-700 hover:bg-slate-600 border-2 border-slate-400 px-3.5 py-1.5 rounded-xl text-xs font-bold">
+                            ⬅ Kembali
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Grid 5 Misi -->
+                <div id="missions-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-5">
+                    <!-- Di-render dinamis lewat JS -->
+                </div>
+
+                <!-- Baris Aktivasi Kamera jika Mode Kamera dipilih -->
+                <div id="camera-activation-bar" class="hidden bg-amber-500/15 border-2 border-amber-400 rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">📷</span>
+                        <div class="text-xs sm:text-sm">
+                            <div class="font-bold text-amber-300">Kontrol Kamera Gesture Dipilih</div>
+                            <div id="camera-perm-status" class="text-indigo-100">Klik tombol di samping untuk mengaktifkan kamera sebelum bermain.</div>
+                        </div>
+                    </div>
+                    <button id="btn-activate-camera" onclick="activateWebcam()" class="btn-arcade bg-emerald-500 hover:bg-emerald-400 text-slate-950 border-2 border-emerald-200 font-bold text-xs sm:text-sm px-4 py-2.5 rounded-xl shrink-0">
+                        🎥 Aktifkan Kamera
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. LAYAR ARENA GAMEPLAY (CANVAS + SOAL + WEBCAM PREVIEW) -->
+        <section id="screen-game" class="hidden relative w-full h-full overflow-hidden wooden-board-bg">
+            
+            <!-- Panel Soal di Bagian Atas (Selalu jelas dan tidak tertutup peringatan) -->
+            <div class="absolute top-2.5 left-1/2 -translate-x-1/2 z-20 w-[94%] max-w-3xl pointer-events-none">
+                <div class="bg-[#2c1507]/95 border-4 border-amber-400 rounded-3xl px-4 py-2.5 sm:px-6 sm:py-3 shadow-[0_8px_25px_rgba(0,0,0,0.65)] text-center">
+                    <div class="flex items-center justify-center gap-2 mb-1">
+                        <span id="question-level-badge" class="bg-amber-400 text-amber-950 text-[10px] sm:text-xs font-extrabold px-2.5 py-0.5 rounded-full uppercase">
+                            LOTS (C1-C2)
+                        </span>
+                        <span id="question-number-label" class="text-xs font-bold text-amber-200">
+                            Pertanyaan 1 dari 10
+                        </span>
+                    </div>
+                    <div id="question-text" class="text-lg sm:text-2xl md:text-3xl font-extrabold text-amber-50 tracking-wide leading-snug drop-shadow">
+                        4 + 3 = ?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Toast Peringatan Bom / Bonus di Sisi Kiri Bawah Soal (Tidak Menutupi Soal!) -->
+            <div id="hazard-warning-container" class="absolute top-28 sm:top-32 left-3 sm:left-5 z-20 flex flex-col gap-2 pointer-events-none max-w-[230px]">
+                <!-- Peringatan dinamis muncul di sini -->
+            </div>
+
+            <!-- Umpan Balik Benar / Salah Tengah Layar -->
+            <div id="feedback-banner" class="hidden absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 pointer-events-none text-center">
+                <div id="feedback-badge" class="px-6 py-3 rounded-3xl font-arcade text-base sm:text-2xl border-4 shadow-2xl transform scale-100 transition-all">
+                    BENAR! +20
+                </div>
+            </div>
+
+            <!-- Canvas Interaktif Utama -->
+            <canvas id="game-canvas" class="w-full h-full block cursor-crosshair"></canvas>
+
+            <!-- Kotak Preview Kecil Webcam di Sudut Kanan Bawah -->
+            <div id="webcam-pip-box" class="hidden absolute bottom-3 right-3 z-20 w-36 h-28 sm:w-44 sm:h-32 bg-slate-950 border-3 border-cyan-400 rounded-2xl overflow-hidden shadow-2xl">
+                <video id="webcam-video" class="w-full h-full object-cover" playsinline muted></video>
+                <canvas id="webcam-overlay" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+                <!-- Indikator Status Kamera Aktif -->
+                <div class="absolute top-1.5 left-1.5 right-1.5 flex items-center justify-between bg-black/70 px-2 py-0.5 rounded-lg">
+                    <span class="flex items-center gap-1 text-[10px] font-bold text-emerald-300">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                        <span id="cam-tracking-label">Kamera Aktif</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Tombol Bantuan Alternatif Keyboard / Kontrol Cepat di Kiri Bawah -->
+            <div class="absolute bottom-3 left-3 z-20 flex items-center gap-2">
+                <button id="btn-ingame-cam" onclick="toggleInGameCamera()" class="btn-arcade bg-indigo-900/90 hover:bg-indigo-800 border-2 border-cyan-400/70 text-cyan-200 px-3 py-2 rounded-2xl text-xs font-bold flex items-center gap-1.5 shadow-lg">
+                    <span>📷</span> <span id="btn-ingame-cam-text">Aktifkan Kamera</span>
+                </button>
+                <div class="hidden lg:block bg-black/55 border border-white/15 text-indigo-200 text-[11px] px-3 py-1.5 rounded-xl">
+                    💡 Geser tangan / mouse untuk memotong buah • Tombol <kbd class="bg-white/20 px-1.5 rounded">1-4</kbd> untuk potong cepat
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. LAYAR KEMENANGAN / SELESAI MISI -->
+        <section id="screen-result" class="hidden w-full h-full overflow-y-auto custom-scroll flex flex-col items-center justify-center p-4 z-30">
+            <div class="max-w-xl w-full bg-[#241452]/95 border-4 border-yellow-400 rounded-3xl p-6 sm:p-8 shadow-2xl text-center">
+                <div id="result-emoji" class="text-6xl mb-3 animate-bounce">🏆</div>
+                <h2 id="result-title" class="font-arcade text-xl sm:text-2xl text-yellow-300 mb-3 leading-relaxed">
+                    MISI SELESAI!
+                </h2>
+                <p id="result-message" class="text-base sm:text-lg text-white font-semibold mb-5 leading-relaxed bg-indigo-950/80 p-4 rounded-2xl border border-indigo-500/50">
+                    Luar biasa, Chef! Kamu berhasil menyelesaikan misi ini dengan hebat!
+                </p>
+
+                <!-- Statistik Hasil -->
+                <div class="grid grid-cols-3 gap-3 mb-6">
+                    <div class="bg-[#180d38] border-2 border-amber-400/60 p-3 rounded-2xl">
+                        <div class="text-xs text-amber-300 font-bold">Total Skor</div>
+                        <div id="result-score" class="font-arcade text-base sm:text-lg text-white mt-1">200</div>
+                    </div>
+                    <div class="bg-[#180d38] border-2 border-emerald-400/60 p-3 rounded-2xl">
+                        <div class="text-xs text-emerald-300 font-bold">Jawaban Benar</div>
+                        <div id="result-correct" class="font-arcade text-base sm:text-lg text-white mt-1">10/10</div>
+                    </div>
+                    <div class="bg-[#180d38] border-2 border-cyan-400/60 p-3 rounded-2xl">
+                        <div class="text-xs text-cyan-300 font-bold">Waktu</div>
+                        <div id="result-time" class="font-arcade text-base sm:text-lg text-white mt-1">00:45</div>
+                    </div>
+                </div>
+
+                <!-- Tombol Aksi -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button id="btn-next-mission" onclick="playNextMission()" class="btn-arcade btn-yellow w-full sm:w-auto px-6 py-3.5 rounded-2xl font-bold text-sm sm:text-base">
+                        🚀 Misi Berikutnya
+                    </button>
+                    <button onclick="replayCurrentMission()" class="btn-arcade bg-sky-500 hover:bg-sky-400 border-2 border-sky-200 text-slate-950 w-full sm:w-auto px-6 py-3.5 rounded-2xl font-bold text-sm sm:text-base">
+                        🔄 Main Kembali
+                    </button>
+                    <button onclick="goToMissionMap()" class="btn-arcade bg-indigo-700 hover:bg-indigo-600 border-2 border-indigo-300 text-white w-full sm:w-auto px-5 py-3.5 rounded-2xl font-bold text-sm sm:text-base">
+                        🗺️ Peta Misi
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== MODAL 1: CARA BERMAIN ==================== -->
+    <div id="modal-howto" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#241452] border-4 border-sky-400 rounded-3xl max-w-2xl w-full max-h-[88vh] flex flex-col shadow-2xl">
+            <div class="flex items-center justify-between p-4 sm:p-5 border-b-2 border-indigo-700">
+                <h3 class="font-arcade text-sm sm:text-lg text-sky-300">📖 CARA BERMAIN</h3>
+                <button onclick="closeModal('modal-howto')" class="btn-arcade bg-rose-600 border-2 border-rose-300 w-9 h-9 rounded-xl font-bold">✕</button>
+            </div>
+            <div class="p-4 sm:p-6 overflow-y-auto custom-scroll space-y-4 text-sm sm:text-base leading-relaxed">
+                <div class="bg-indigo-950/90 border-2 border-sky-500/40 rounded-2xl p-4">
+                    <p class="font-bold text-amber-300">📚 Materi: Penjumlahan dan Pengurangan Bilangan 1–100</p>
+                    <p class="mt-2 text-indigo-100">
+                        <strong class="text-cyan-300">Kegiatan pembelajaran:</strong> Math Ninja yaitu peserta didik bermain memotong buah yang berisi soal-soal matematika dengan tingkat kesulitan bertahap, mulai dari <span class="text-emerald-300 font-bold">LOTS</span>, <span class="text-amber-300 font-bold">MOTS</span>, hingga <span class="text-rose-300 font-bold">HOTS</span>.
+                    </p>
+                </div>
+
+                <div>
+                    <h4 class="font-bold text-yellow-300 text-base sm:text-lg mb-2">⚔️ Langkah-Langkah Cara Bermain:</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-indigo-100 bg-[#180d38] p-4 rounded-2xl border border-indigo-700">
+                        <li>Mulai permainan dengan menekan tombol <strong class="text-yellow-300">MULAI</strong> pada peta misi.</li>
+                        <li>Perhatikan soal matematika yang muncul di layar.</li>
+                        <li>Amati buah-buahan yang membawa pilihan jawaban (nanas, apel, jeruk, kiwi, pisang, semangka).</li>
+                        <li>Geser jari (telunjuk / telapak tangan di kamera) atau mouse pada buah yang memiliki jawaban benar.</li>
+                        <li>Kumpulkan poin (<strong class="text-emerald-300">+20 poin</strong>) setiap kali berhasil memotong buah dengan jawaban yang tepat.</li>
+                        <li>Hindari buah dengan jawaban salah dan <strong class="text-rose-400">bom 💣</strong> agar permainan tetap aman (manfaatkan juga <strong class="text-cyan-300">bubble bonus 🫧</strong>).</li>
+                        <li>Selesaikan semua tantangan untuk naik ke level berikutnya.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="p-4 border-t-2 border-indigo-700 text-right">
+                <button onclick="closeModal('modal-howto')" class="btn-arcade btn-yellow px-6 py-2.5 rounded-2xl font-bold text-sm">Siap Bermain! 👍</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL 2: TUJUAN PEMBELAJARAN & MATERI ==================== -->
+    <div id="modal-objectives" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#241452] border-4 border-emerald-400 rounded-3xl max-w-3xl w-full max-h-[88vh] flex flex-col shadow-2xl">
+            <div class="flex items-center justify-between p-4 sm:p-5 border-b-2 border-indigo-700">
+                <h3 class="font-arcade text-xs sm:text-base text-emerald-300">🎯 TUJUAN PEMBELAJARAN & MATERI</h3>
+                <button onclick="closeModal('modal-objectives')" class="btn-arcade bg-rose-600 border-2 border-rose-300 w-9 h-9 rounded-xl font-bold">✕</button>
+            </div>
+            <div class="p-4 sm:p-6 overflow-y-auto custom-scroll space-y-5 text-sm sm:text-base">
+                <div class="bg-indigo-950/90 border-2 border-emerald-500/40 rounded-2xl p-4">
+                    <h4 class="font-bold text-amber-300 text-base mb-2">📚 Materi: Penjumlahan dan Pengurangan Bilangan 1–100</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-indigo-100">
+                        <li>Memahami dan mengidentifikasi konsep penjumlahan dan pengurangan bilangan cacah sampai 100 melalui soal-soal sederhana pada permainan memotong buah (<strong class="text-emerald-300">LOTS</strong>).</li>
+                        <li>Menerapkan dan menyelesaikan operasi hitung penjumlahan dan pengurangan bilangan cacah sampai 100 dengan strategi yang tepat melalui tantangan permainan pada setiap level (<strong class="text-amber-300">MOTS</strong>).</li>
+                        <li>Menganalisis dan memecahkan permasalahan sehari-hari yang berkaitan dengan penjumlahan dan pengurangan bilangan cacah sampai 100 serta menentukan jawaban yang tepat berdasarkan situasi dalam permainan (<strong class="text-rose-300">HOTS</strong>).</li>
+                    </ol>
+                </div>
+
+                <!-- Tabel Pembagian Level -->
+                <div>
+                    <h4 class="font-bold text-yellow-300 mb-2">📊 Pembagian 5 Level dalam Game:</h4>
+                    <div class="overflow-x-auto rounded-2xl border-2 border-indigo-600">
+                        <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                            <thead>
+                                <tr class="bg-indigo-900 text-amber-300">
+                                    <th class="p-3 border-b border-indigo-700">Level / Misi</th>
+                                    <th class="p-3 border-b border-indigo-700">Tingkat Berpikir</th>
+                                    <th class="p-3 border-b border-indigo-700">Bentuk Tantangan</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-[#180d38] divide-y divide-indigo-800">
+                                <tr>
+                                    <td class="p-3 font-bold text-emerald-300">Level 1 – Pemula</td>
+                                    <td class="p-3 font-semibold">LOTS (Angka 1–10)</td>
+                                    <td class="p-3 text-indigo-100">Penjumlahan dan pengurangan dasar bilangan 1–10.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-teal-300">Level 2 – Penjelajah</td>
+                                    <td class="p-3 font-semibold">LOTS (Angka 1–20)</td>
+                                    <td class="p-3 text-indigo-100">Penjumlahan dan pengurangan dasar bilangan 1–20.</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-amber-300">Level 3 – Petualang</td>
+                                    <td class="p-3 font-semibold">LOTS & MOTS (Angka 1–20)</td>
+                                    <td class="p-3 text-indigo-100">Operasi hitung dan melengkapi bilangan rumpang (1–20).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-orange-300">Level 4 – Koki Ahli</td>
+                                    <td class="p-3 font-semibold">LOTS & MOTS (Angka 1–30)</td>
+                                    <td class="p-3 text-indigo-100">Strategi penjumlahan, pengurangan, dan hitung campuran (1–30).</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 font-bold text-rose-300">Level 5 – Master Chef</td>
+                                    <td class="p-3 font-semibold">LOTS, MOTS & HOTS (1–100)</td>
+                                    <td class="p-3 text-indigo-100">Kombinasi soal hitung hingga analisis soal cerita sehari-hari.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Kategori Soal -->
+                <div class="bg-[#180d38] border border-indigo-700 rounded-2xl p-4">
+                    <h4 class="font-bold text-cyan-300 mb-1.5">🧩 Kategori Soal:</h4>
+                    <ul class="list-disc list-inside space-y-1 text-indigo-100 text-xs sm:text-sm">
+                        <li><strong>Pertanyaan Tipe 1:</strong> LOTS (mengingat dan memahami).</li>
+                        <li><strong>Pertanyaan Tipe 2:</strong> MOTS (menerapkan konsep).</li>
+                        <li><strong>Pertanyaan Tipe 3:</strong> HOTS (menganalisis, mengevaluasi, atau memecahkan masalah).</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="p-4 border-t-2 border-indigo-700 text-right">
+                <button onclick="closeModal('modal-objectives')" class="btn-arcade btn-yellow px-6 py-2.5 rounded-2xl font-bold text-sm">Mengerti! ✨</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL 3: PAPAN SKOR (TOP 5) ==================== -->
+    <div id="modal-leaderboard" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#241452] border-4 border-fuchsia-400 rounded-3xl max-w-lg w-full flex flex-col shadow-2xl">
+            <div class="flex items-center justify-between p-4 sm:p-5 border-b-2 border-indigo-700">
+                <h3 class="font-arcade text-sm sm:text-base text-fuchsia-300">🏆 PAPAN SKOR TOP 5</h3>
+                <button onclick="closeModal('modal-leaderboard')" class="btn-arcade bg-rose-600 border-2 border-rose-300 w-9 h-9 rounded-xl font-bold">✕</button>
+            </div>
+            <div class="p-4 sm:p-6">
+                <p class="text-xs sm:text-sm text-indigo-200 mb-3">5 Chef Matematika dengan nilai tertinggi:</p>
+                <div id="leaderboard-list" class="space-y-2.5">
+                    <!-- Diisi lewat JS -->
+                </div>
+            </div>
+            <div class="p-4 border-t-2 border-indigo-700 text-right">
+                <button onclick="closeModal('modal-leaderboard')" class="btn-arcade btn-yellow px-6 py-2.5 rounded-2xl font-bold text-sm">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL KONFIRMASI KEMBALI KE MENU ==================== -->
+    <div id="modal-confirm-exit" class="hidden fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-[#241452] border-4 border-amber-400 rounded-3xl max-w-md w-full p-6 text-center shadow-2xl">
+            <div class="text-4xl mb-2">🤔</div>
+            <h3 class="font-arcade text-sm sm:text-base text-yellow-300 mb-2">KELUAR DARI MISI?</h3>
+            <p class="text-sm text-indigo-100 mb-5">Progres soal pada misi yang sedang berjalan akan diulang jika kamu kembali ke menu utama.</p>
+            <div class="flex justify-center gap-3">
+                <button onclick="closeModal('modal-confirm-exit')" class="btn-arcade bg-emerald-500 border-2 border-emerald-200 text-slate-950 font-bold px-5 py-2.5 rounded-2xl text-sm">
+                    Lanjut Main
+                </button>
+                <button onclick="executeReturnHome()" class="btn-arcade bg-rose-600 border-2 border-rose-300 text-white font-bold px-5 py-2.5 rounded-2xl text-sm">
+                    Ke Menu Utama
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== SCRIPT LOGIKA GAME & MEDIAPIPE ==================== -->
+    <script>
+        /**
+         * ============================================================================
+         * 1. BANK SOAL MATEMATIKA KELAS 2 (5 MISI x 10 SOAL = 50 SOAL)
+         * Level 1: LOTS (1-10) | Level 2: LOTS (1-20) | Level 3: LOTS & MOTS (1-20)
+         * Level 4: LOTS & MOTS (1-30) | Level 5: LOTS, MOTS & HOTS (1-100)
+         * ============================================================================
+         */
+        const MISSIONS_DATA = [
+            {
+                id: 1,
+                title: "Misi 1: Dapur Pemula",
+                levelBadge: "Level 1 • Pemula (LOTS 1–10)",
+                category: "LOTS (C1–C2)",
+                description: "Soal LOTS penjumlahan & pengurangan dasar dengan angka 1–10.",
+                icon: "🍎",
+                questions: [
+                    { q: "3 + 4 = ?", ans: 7, opts: [7, 6, 8, 5], type: "LOTS" },
+                    { q: "5 + 2 = ?", ans: 7, opts: [7, 8, 6, 9], type: "LOTS" },
+                    { q: "6 + 3 = ?", ans: 9, opts: [9, 8, 10, 7], type: "LOTS" },
+                    { q: "4 + 6 = ?", ans: 10, opts: [10, 9, 8, 7], type: "LOTS" },
+                    { q: "2 + 5 = ?", ans: 7, opts: [7, 6, 8, 9], type: "LOTS" },
+                    { q: "8 - 3 = ?", ans: 5, opts: [5, 4, 6, 3], type: "LOTS" },
+                    { q: "9 - 4 = ?", ans: 5, opts: [5, 6, 4, 7], type: "LOTS" },
+                    { q: "10 - 6 = ?", ans: 4, opts: [4, 5, 3, 6], type: "LOTS" },
+                    { q: "7 - 2 = ?", ans: 5, opts: [5, 4, 6, 8], type: "LOTS" },
+                    { q: "10 - 3 = ?", ans: 7, opts: [7, 6, 8, 9], type: "LOTS" }
+                ]
+            },
+            {
+                id: 2,
+                title: "Misi 2: Kebun Penjelajah",
+                levelBadge: "Level 2 • Penjelajah (LOTS 1–20)",
+                category: "LOTS (C1–C2)",
+                description: "Soal LOTS penjumlahan & pengurangan dengan angka 1–20.",
+                icon: "🍊",
+                questions: [
+                    { q: "8 + 6 = ?", ans: 14, opts: [14, 13, 15, 12], type: "LOTS" },
+                    { q: "11 + 5 = ?", ans: 16, opts: [16, 15, 17, 14], type: "LOTS" },
+                    { q: "9 + 8 = ?", ans: 17, opts: [17, 16, 18, 19], type: "LOTS" },
+                    { q: "12 + 7 = ?", ans: 19, opts: [19, 18, 20, 17], type: "LOTS" },
+                    { q: "14 + 6 = ?", ans: 20, opts: [20, 18, 19, 16], type: "LOTS" },
+                    { q: "15 - 4 = ?", ans: 11, opts: [11, 10, 12, 9], type: "LOTS" },
+                    { q: "18 - 7 = ?", ans: 11, opts: [11, 12, 10, 13], type: "LOTS" },
+                    { q: "16 - 9 = ?", ans: 7, opts: [7, 8, 6, 9], type: "LOTS" },
+                    { q: "20 - 8 = ?", ans: 12, opts: [12, 11, 13, 14], type: "LOTS" },
+                    { q: "19 - 6 = ?", ans: 13, opts: [13, 14, 12, 15], type: "LOTS" }
+                ]
+            },
+            {
+                id: 3,
+                title: "Misi 3: Petualang Cerdas",
+                levelBadge: "Level 3 • Petualang (LOTS & MOTS 1–20)",
+                category: "LOTS & MOTS",
+                description: "Campuran soal LOTS dan MOTS (bilangan rumpang) angka 1–20.",
+                icon: "🍍",
+                questions: [
+                    { q: "13 + 6 = ?", ans: 19, opts: [19, 18, 17, 20], type: "LOTS" },
+                    { q: "17 - 8 = ?", ans: 9, opts: [9, 8, 10, 7], type: "LOTS" },
+                    { q: "7 + 9 = ?", ans: 16, opts: [16, 15, 17, 14], type: "LOTS" },
+                    { q: "20 - 11 = ?", ans: 9, opts: [9, 8, 10, 11], type: "LOTS" },
+                    { q: "8 + ... = 15", ans: 7, opts: [7, 6, 8, 9], type: "MOTS" },
+                    { q: "... + 9 = 18", ans: 9, opts: [9, 8, 10, 7], type: "MOTS" },
+                    { q: "16 - ... = 9", ans: 7, opts: [7, 6, 8, 5], type: "MOTS" },
+                    { q: "12 + ... = 20", ans: 8, opts: [8, 7, 9, 6], type: "MOTS" },
+                    { q: "6 + 7 + 4 = ?", ans: 17, opts: [17, 16, 18, 15], type: "MOTS" },
+                    { q: "19 - 5 - 6 = ?", ans: 8, opts: [8, 7, 9, 10], type: "MOTS" }
+                ]
+            },
+            {
+                id: 4,
+                title: "Misi 4: Koki Ahli Berhitung",
+                levelBadge: "Level 4 • Koki Ahli (LOTS & MOTS 1–30)",
+                category: "LOTS & MOTS",
+                description: "Campuran soal LOTS dan MOTS dengan angka 1–30.",
+                icon: "🥝",
+                questions: [
+                    { q: "16 + 12 = ?", ans: 28, opts: [28, 26, 29, 27], type: "LOTS" },
+                    { q: "27 - 14 = ?", ans: 13, opts: [13, 12, 14, 15], type: "LOTS" },
+                    { q: "19 + 11 = ?", ans: 30, opts: [30, 29, 28, 20], type: "LOTS" },
+                    { q: "25 - 18 = ?", ans: 7, opts: [7, 8, 6, 9], type: "LOTS" },
+                    { q: "14 + ... = 26", ans: 12, opts: [12, 11, 13, 14], type: "MOTS" },
+                    { q: "... + 13 = 30", ans: 17, opts: [17, 16, 18, 15], type: "MOTS" },
+                    { q: "28 - ... = 15", ans: 13, opts: [13, 12, 14, 11], type: "MOTS" },
+                    { q: "15 + 9 - 6 = ?", ans: 18, opts: [18, 17, 19, 16], type: "MOTS" },
+                    { q: "24 - 8 + 7 = ?", ans: 23, opts: [23, 22, 24, 21], type: "MOTS" },
+                    { q: "30 - 12 - 5 = ?", ans: 13, opts: [13, 14, 12, 15], type: "MOTS" }
+                ]
+            },
+            {
+                id: 5,
+                title: "Misi 5: Master Chef HOTS",
+                levelBadge: "Level 5 • Master Chef (LOTS, MOTS & HOTS)",
+                category: "LOTS, MOTS & HOTS",
+                description: "Kombinasi soal LOTS, MOTS, dan soal cerita HOTS (1–100).",
+                icon: "🍉",
+                questions: [
+                    { q: "34 + 25 = ?", ans: 59, opts: [59, 49, 69, 58], type: "LOTS" },
+                    { q: "68 - 32 = ?", ans: 36, opts: [36, 26, 46, 34], type: "LOTS" },
+                    { q: "45 + ... = 70", ans: 25, opts: [25, 35, 15, 20], type: "MOTS" },
+                    { q: "50 - 18 + 12 = ?", ans: 44, opts: [44, 34, 54, 42], type: "MOTS" },
+                    { q: "Ibu beli 24 apel dan 18 jeruk. Jumlah buah ibu adalah...", ans: 42, opts: [42, 32, 52, 40], type: "HOTS" },
+                    { q: "Ada 50 kue di piring. Dimakan adik 16 kue. Sisa kue...", ans: 34, opts: [34, 44, 24, 36], type: "HOTS" },
+                    { q: "Budi memetik 28 kiwi, Sinta 34 kiwi. Selisih buah mereka...", ans: 6, opts: [6, 16, 14, 8], type: "HOTS" },
+                    { q: "Di rak ada 45 roti, ditambah 25 roti, lalu laku 30. Sisa...", ans: 40, opts: [40, 50, 30, 70], type: "HOTS" },
+                    { q: "Chef butuh 80 nanas. Baru ada 47 nanas. Kurangnya adalah...", ans: 33, opts: [33, 43, 23, 37], type: "HOTS" },
+                    { q: "Uang Saku 100 koin. Beli buku 45 koin & pensil 25 koin. Sisa...", ans: 30, opts: [30, 40, 20, 35], type: "HOTS" }
+                ]
+            }
+        ];
+
+        // Jenis Buah yang tersedia (Nanas, Apel, Jeruk, Kiwi, Pisang, Semangka)
+        const FRUIT_TYPES = [
+            { id: 'nanas', name: 'Nanas', mainColor: '#f59e0b', innerColor: '#fef08a', leafColor: '#16a34a' },
+            { id: 'apel', name: 'Apel', mainColor: '#ef4444', innerColor: '#fef9c3', leafColor: '#22c55e' },
+            { id: 'jeruk', name: 'Jeruk', mainColor: '#f97316', innerColor: '#ffedd5', leafColor: '#15803d' },
+            { id: 'kiwi', name: 'Kiwi', mainColor: '#854d0e', innerColor: '#84cc16', leafColor: '#365314' },
+            { id: 'pisang', name: 'Pisang', mainColor: '#eab308', innerColor: '#fefce8', leafColor: '#a16207' },
+            { id: 'semangka', name: 'Semangka', mainColor: '#16a34a', innerColor: '#f43f5e', leafColor: '#064e3b' }
+        ];
+
+        /**
+         * ============================================================================
+         * 2. STATE GLOBAL PERMAINAN & PENYIMPANAN LOKAL
+         * ============================================================================
+         */
+        const STORAGE_KEYS = {
+            STUDENT_NAME: 'math_ninja_student_name',
+            UNLOCKED_MISSION: 'math_ninja_unlocked_mission',
+            HIGHSCORES: 'math_ninja_highscores'
+        };
+
+        let gameState = {
+            studentName: localStorage.getItem(STORAGE_KEYS.STUDENT_NAME) || 'Chef Cilik',
+            controlMode: 'pointer', // 'camera' atau 'pointer'
+            unlockedMission: parseInt(localStorage.getItem(STORAGE_KEYS.UNLOCKED_MISSION) || '1', 10),
+            soundEnabled: true,
+            
+            // State sesi permainan aktif
+            isPlaying: false,
+            currentMissionIdx: 0,
+            currentQuestionIdx: 0,
+            score: 0,
+            lives: 3,
+            maxLives: 5,
+            correctCount: 0,
+            elapsedSeconds: 0,
+            
+            // Multiplier & Power-ups
+            scoreMultiplier: 1,
+            multiplierTimeLeft: 0,
+            
+            // Timer spawn objek
+            bombTimer: 0,      // Muncul setiap 10 detik
+            bonusTimer: 0,     // Muncul setiap 15 detik
+            questionLocked: false
+        };
+
+        // Objek pada Canvas
+        let fruits = [];         // Buah pembawa pilihan jawaban
+        let slicedHalves = [];   // Belahan buah animasi terbelah 2
+        let bombs = [];          // Bom berbahaya
+        let bonuses = [];        // Bubble bonus
+        let particles = [];      // Percikan jus & ledakan
+        let floatingTexts = [];  // Teks skor melayang (+20, 2X, dll)
+        let bladeTrail = [];     // Jejak cahaya pedang (telunjuk / telapak / mouse)
+
+        // Kursor aktif (baik dari kamera maupun mouse/touch)
+        let pointer = {
+            x: -200,
+            y: -200,
+            prevX: -200,
+            prevY: -200,
+            active: false,
+            speed: 0
+        };
+
+        // Kamera & MediaPipe Hands State
+        let cameraActive = false;
+        let handsDetector = null;
+        let videoStream = null;
+        let handAnimFrameId = null;
+
+        // Canvas & Audio Context
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        let audioCtx = null;
+        let lastFrameTime = 0;
+        let secondAccumulator = 0;
+
+        /**
+         * ============================================================================
+         * 3. SISTEM EFEK SUARA SINTETIS (WEB AUDIO API - TANPA FILE EKSTERNAL)
+         * ============================================================================
+         */
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioContextClass) {
+                    audioCtx = new AudioContextClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (!gameState.soundEnabled) return;
+            initAudio();
+            if (!audioCtx) return;
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'slice') {
+                // Suara tebasan pedang + percikan segar
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(650, now);
+                osc.frequency.exponentialRampToValueAtTime(160, now + 0.14);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.14);
+                osc.start(now);
+                osc.stop(now + 0.14);
+            } else if (type === 'correct') {
+                // Nada ceria naik (Do - Mi - Sol)
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(523.25, now);
+                osc.frequency.setValueAtTime(659.25, now + 0.08);
+                osc.frequency.setValueAtTime(783.99, now + 0.16);
+                gain.gain.setValueAtTime(0.28, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            } else if (type === 'wrong') {
+                // Nada rendah buzzer lembut
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(190, now);
+                osc.frequency.linearRampToValueAtTime(120, now + 0.3);
+                gain.gain.setValueAtTime(0.22, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.32);
+                osc.start(now);
+                osc.stop(now + 0.32);
+            } else if (type === 'bomb') {
+                // Ledakan bom
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(140, now);
+                osc.frequency.exponentialRampToValueAtTime(35, now + 0.5);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.52);
+                osc.start(now);
+                osc.stop(now + 0.52);
+            } else if (type === 'bonus') {
+                // Suara gelembung ajaib berkilau
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(587.33, now);
+                osc.frequency.exponentialRampToValueAtTime(1174.66, now + 0.28);
+                gain.gain.setValueAtTime(0.25, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                // Fanfare kemenangan
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'triangle';
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.frequency.setValueAtTime(freq, now + idx * 0.12);
+                    g.gain.setValueAtTime(0.25, now + idx * 0.12);
+                    g.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.12 + 0.35);
+                    o.start(now + idx * 0.12);
+                    o.stop(now + idx * 0.12 + 0.35);
+                });
+            }
+        }
+
+        function toggleSound() {
+            gameState.soundEnabled = !gameState.soundEnabled;
+            document.getElementById('btn-toggle-sound').textContent = gameState.soundEnabled ? '🔊' : '🔇';
+        }
+
+        /**
+         * ============================================================================
+         * 4. NAVIGASI LAYAR, INPUT NAMA & MODAL
+         * ============================================================================
+         */
+        function initApp() {
+            const nameInput = document.getElementById('input-student-name');
+            if (localStorage.getItem(STORAGE_KEYS.STUDENT_NAME)) {
+                nameInput.value = gameState.studentName;
+            }
+            updateNavbarName(gameState.studentName);
+
+            nameInput.addEventListener('input', (e) => {
+                const val = e.target.value.trim();
+                gameState.studentName = val || 'Chef Cilik';
+                localStorage.setItem(STORAGE_KEYS.STUDENT_NAME, gameState.studentName);
+                updateNavbarName(gameState.studentName);
+            });
+
+            // Inisialisasi skor default jika belum ada
+            if (!localStorage.getItem(STORAGE_KEYS.HIGHSCORES)) {
+                const defaultScores = [
+                    { name: "Chef Aisyah", score: 260, mission: "Misi 5" },
+                    { name: "Chef Rafa", score: 220, mission: "Misi 4" },
+                    { name: "Chef Kirana", score: 200, mission: "Misi 3" },
+                    { name: "Chef Bima", score: 180, mission: "Misi 2" },
+                    { name: "Chef Nabila", score: 160, mission: "Misi 1" }
+                ];
+                localStorage.setItem(STORAGE_KEYS.HIGHSCORES, JSON.stringify(defaultScores));
+            }
+
+            selectControlMode('pointer');
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            setupPointerAndKeyboardControls();
+        }
+
+        function updateNavbarName(name) {
+            document.getElementById('nav-student-name').textContent = name || 'Chef Cilik';
+        }
+
+        function selectControlMode(mode) {
+            gameState.controlMode = mode;
+            const camBtn = document.getElementById('mode-camera-btn');
+            const ptrBtn = document.getElementById('mode-pointer-btn');
+
+            if (mode === 'camera') {
+                camBtn.className = "flex items-center gap-3 p-3 rounded-2xl border-3 transition text-left bg-cyan-600/30 border-cyan-400 shadow-md";
+                ptrBtn.className = "flex items-center gap-3 p-3 rounded-2xl border-3 transition text-left bg-indigo-900/60 border-indigo-500/50 hover:border-cyan-400";
+            } else {
+                ptrBtn.className = "flex items-center gap-3 p-3 rounded-2xl border-3 transition text-left bg-cyan-600/30 border-cyan-400 shadow-md";
+                camBtn.className = "flex items-center gap-3 p-3 rounded-2xl border-3 transition text-left bg-indigo-900/60 border-indigo-500/50 hover:border-cyan-400";
+            }
+        }
+
+        function showScreen(screenId) {
+            ['screen-menu', 'screen-missions', 'screen-game', 'screen-result'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+
+            const isGame = screenId === 'screen-game';
+            document.getElementById('game-hud').classList.toggle('hidden', !isGame);
+            document.getElementById('btn-nav-home').classList.toggle('hidden', screenId === 'screen-menu');
+        }
+
+        function openModal(modalId) {
+            initAudio();
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function confirmReturnHome() {
+            if (gameState.isPlaying) {
+                openModal('modal-confirm-exit');
+            } else {
+                showScreen('screen-menu');
+            }
+        }
+
+        function executeReturnHome() {
+            closeModal('modal-confirm-exit');
+            gameState.isPlaying = false;
+            showScreen('screen-menu');
+        }
+
+        function openLeaderboard() {
+            const listEl = document.getElementById('leaderboard-list');
+            const scores = JSON.parse(localStorage.getItem(STORAGE_KEYS.HIGHSCORES) || '[]');
+            const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+
+            listEl.innerHTML = scores.slice(0, 5).map((item, i) => `
+                <div class="flex items-center justify-between bg-[#180d38] border-2 ${i === 0 ? 'border-yellow-400' : 'border-indigo-700'} px-4 py-3 rounded-2xl">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xl">${medals[i]}</span>
+                        <div>
+                            <div class="font-bold text-white text-sm sm:text-base">${escapeHtml(item.name)}</div>
+                            <div class="text-xs text-indigo-300">${escapeHtml(item.mission)}</div>
+                        </div>
+                    </div>
+                    <div class="font-arcade text-sm sm:text-base text-yellow-300">${item.score}</div>
+                </div>
+            `).join('');
+
+            openModal('modal-leaderboard');
+        }
+
+        function saveScoreToLeaderboard(name, score, missionTitle) {
+            let scores = JSON.parse(localStorage.getItem(STORAGE_KEYS.HIGHSCORES) || '[]');
+            scores.push({ name: name, score: score, mission: missionTitle });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 5);
+            localStorage.setItem(STORAGE_KEYS.HIGHSCORES, JSON.stringify(scores));
+        }
+
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        /**
+         * ============================================================================
+         * 5. PETA MISI (5 MISI SEKUENSIAL)
+         * ============================================================================
+         */
+        function goToMissionMap() {
+            initAudio();
+            const nameVal = document.getElementById('input-student-name').value.trim();
+            gameState.studentName = nameVal || 'Chef Cilik';
+            localStorage.setItem(STORAGE_KEYS.STUDENT_NAME, gameState.studentName);
+            updateNavbarName(gameState.studentName);
+
+            gameState.isPlaying = false;
+            renderMissionCards();
+
+            const badge = document.getElementById('mission-control-badge');
+            badge.textContent = gameState.controlMode === 'camera' ? 'Mode: 📷 Gesture Kamera' : 'Mode: 🖱️ Mouse / Sentuh';
+
+            const camBar = document.getElementById('camera-activation-bar');
+            camBar.classList.toggle('hidden', gameState.controlMode !== 'camera');
+
+            showScreen('screen-missions');
+        }
+
+        function renderMissionCards() {
+            const grid = document.getElementById('missions-grid');
+            grid.innerHTML = MISSIONS_DATA.map((m, idx) => {
+                const isUnlocked = m.id <= gameState.unlockedMission;
+                const isCompleted = m.id < gameState.unlockedMission;
+
+                return `
+                    <div class="rounded-3xl p-4 border-3 flex flex-col justify-between transition ${
+                        isUnlocked 
+                        ? 'bg-[#180d38] border-yellow-400/80 shadow-lg' 
+                        : 'bg-slate-900/70 border-slate-700 opacity-70'
+                    }">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-3xl">${isUnlocked ? m.icon : '🔒'}</span>
+                                <span class="text-[11px] font-extrabold px-2.5 py-1 rounded-full ${
+                                    isCompleted ? 'bg-emerald-400 text-slate-950' : 
+                                    isUnlocked ? 'bg-amber-400 text-slate-950' : 'bg-slate-700 text-slate-300'
+                                }">
+                                    ${isCompleted ? '✅ SELESAI' : isUnlocked ? 'TERBUKA' : 'TERKUNCI'}
+                                </span>
+                            </div>
+                            <h3 class="font-bold text-base sm:text-lg text-white mb-1">${m.title}</h3>
+                            <div class="text-xs font-bold text-cyan-300 mb-1.5">${m.levelBadge} • 10 Soal</div>
+                            <p class="text-xs text-indigo-200 mb-4">${m.description}</p>
+                        </div>
+
+                        <button onclick="startMission(${idx})" ${!isUnlocked ? 'disabled' : ''} 
+                            class="btn-arcade w-full py-2.5 rounded-2xl font-bold text-xs sm:text-sm ${
+                                isUnlocked 
+                                ? 'btn-yellow cursor-pointer' 
+                                : 'bg-slate-800 text-slate-500 border-2 border-slate-700 cursor-not-allowed'
+                            }">
+                            ${isUnlocked ? '⚔️ MULAI MISI' : '🔒 Selesaikan Misi Sebelumnya'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        /**
+         * ============================================================================
+         * 6. DETEKSI GESTURE TANGAN VIA WEBCAM & MEDIAPIPE HANDS
+         * (Mendukung Ujung Telunjuk Landmark 8 & Telapak Tangan Landmark 9)
+         * ============================================================================
+         */
+        async function activateWebcam() {
+            initAudio();
+            const statusEl = document.getElementById('camera-perm-status');
+            const btnEl = document.getElementById('btn-activate-camera');
+
+            if (cameraActive) {
+                if (statusEl) statusEl.textContent = "✅ Kamera sudah aktif dan siap digunakan!";
+                return;
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                if (statusEl) statusEl.textContent = "⚠️ Browser tidak mendukung kamera. Gunakan Mouse/Layar Sentuh.";
+                return;
+            }
+
+            try {
+                if (btnEl) btnEl.textContent = "⏳ Membuka Kamera...";
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: 320, height: 240, facingMode: "user" },
+                    audio: false
+                });
+
+                const videoEl = document.getElementById('webcam-video');
+                videoEl.srcObject = videoStream;
+                await videoEl.play();
+
+                cameraActive = true;
+                document.getElementById('webcam-pip-box').classList.remove('hidden');
+                document.getElementById('btn-ingame-cam-text').textContent = "Kamera Aktif ✅";
+                if (statusEl) statusEl.textContent = "✅ Kamera Aktif! Gerakkan telunjuk atau telapak tangan di depan kamera.";
+                if (btnEl) btnEl.textContent = "✅ Kamera Aktif";
+
+                initMediaPipeHands(videoEl);
+            } catch (err) {
+                console.warn("Kamera tidak dapat diakses:", err);
+                cameraActive = false;
+                if (statusEl) statusEl.textContent = "⚠️ Izin kamera ditolak/tidak tersedia. Otomatis menggunakan kontrol Mouse/Sentuh.";
+                if (btnEl) btnEl.textContent = "🎥 Coba Lagi";
+                showHazardToast("📷 Kamera tidak aktif, gunakan Mouse/Sentuh!", "bg-amber-600");
+            }
+        }
+
+        function toggleInGameCamera() {
+            if (!cameraActive) {
+                activateWebcam();
+            } else {
+                const pip = document.getElementById('webcam-pip-box');
+                pip.classList.toggle('hidden');
+            }
+        }
+
+        function initMediaPipeHands(videoEl) {
+            const overlayCanvas = document.getElementById('webcam-overlay');
+            const overlayCtx = overlayCanvas.getContext('2d');
+            const trackingLabel = document.getElementById('cam-tracking-label');
+
+            if (typeof Hands === 'undefined') {
+                trackingLabel.textContent = "Kamera Aktif (Mode Dasar)";
+                return;
+            }
+
+            handsDetector = new Hands({
+                locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+            });
+
+            handsDetector.setOptions({
+                maxNumHands: 1,
+                modelComplexity: 0, // Ringan dan cepat untuk Chrome & Edge
+                minDetectionConfidence: 0.55,
+                minTrackingConfidence: 0.5
+            });
+
+            handsDetector.onResults((results) => {
+                overlayCanvas.width = videoEl.videoWidth || 320;
+                overlayCanvas.height = videoEl.videoHeight || 240;
+                overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+                if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                    const landmarks = results.multiHandLandmarks[0];
+                    trackingLabel.textContent = "Tangan Terdeteksi ✋";
+
+                    // Landmark 8 = Ujung Jari Telunjuk, Landmark 9 = Tengah Telapak Tangan
+                    const indexTip = landmarks[8];
+                    const palmCenter = landmarks[9];
+
+                    // Gunakan gabungan posisi telunjuk & telapak agar nyaman untuk gerakan menyilang maupun telapak terbuka
+                    const rawX = (indexTip.x * 0.65 + palmCenter.x * 0.35);
+                    const rawY = (indexTip.y * 0.65 + palmCenter.y * 0.35);
+
+                    // Mirror horizontal (1 - rawX) agar sesuai gerakan cermin
+                    const mappedX = (1 - rawX) * canvas.width;
+                    const mappedY = rawY * canvas.height;
+
+                    updateBladePosition(mappedX, mappedY);
+
+                    // Gambar titik indikator di preview kamera kecil
+                    const drawX = (1 - rawX) * overlayCanvas.width;
+                    const drawY = rawY * overlayCanvas.height;
+                    overlayCtx.beginPath();
+                    overlayCtx.arc(drawX, drawY, 8, 0, Math.PI * 2);
+                    overlayCtx.fillStyle = '#00f5d4';
+                    overlayCtx.fill();
+                    overlayCtx.lineWidth = 2;
+                    overlayCtx.strokeStyle = '#ffffff';
+                    overlayCtx.stroke();
+                } else {
+                    trackingLabel.textContent = "Arahkan Tangan ✋";
+                }
+            });
+
+            async function processVideoFrame() {
+                if (!cameraActive) return;
+                if (videoEl.readyState >= 2 && handsDetector) {
+                    try {
+                        await handsDetector.send({ image: videoEl });
+                    } catch (e) {
+                        // Abaikan frame error sesaat
+                    }
+                }
+                handAnimFrameId = requestAnimationFrame(processVideoFrame);
+            }
+            processVideoFrame();
+        }
+
+        /**
+         * ============================================================================
+         * 7. KONTROL ALTERNATIF MOUSE, LAYAR SENTUH & KEYBOARD
+         * ============================================================================
+         */
+        function setupPointerAndKeyboardControls() {
+            // Mouse Move
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                updateBladePosition(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            // Touch Move & Touch Start
+            canvas.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 0) {
+                    const rect = canvas.getBoundingClientRect();
+                    const t = e.touches[0];
+                    pointer.x = t.clientX - rect.left;
+                    pointer.y = t.clientY - rect.top;
+                    updateBladePosition(pointer.x, pointer.y);
+                }
+            }, { passive: true });
+
+            canvas.addEventListener('touchmove', (e) => {
+                if (e.touches.length > 0) {
+                    const rect = canvas.getBoundingClientRect();
+                    const t = e.touches[0];
+                    updateBladePosition(t.clientX - rect.left, t.clientY - rect.top);
+                }
+            }, { passive: true });
+
+            // Keyboard shortcut (Tombol 1, 2, 3, 4 untuk memotong buah pilihan ke-1 s/d ke-4)
+            window.addEventListener('keydown', (e) => {
+                if (!gameState.isPlaying || gameState.questionLocked) return;
+                const keyMap = { '1': 0, '2': 1, '3': 2, '4': 3 };
+                if (e.key in keyMap) {
+                    const idx = keyMap[e.key];
+                    if (fruits[idx] && !fruits[idx].sliced) {
+                        // Simulasikan tebasan pedang ke buah tersebut
+                        updateBladePosition(fruits[idx].x - 30, fruits[idx].y);
+                        updateBladePosition(fruits[idx].x + 30, fruits[idx].y);
+                        sliceFruit(fruits[idx]);
+                    }
+                }
+            });
+        }
+
+        function updateBladePosition(x, y) {
+            pointer.prevX = pointer.x < 0 ? x : pointer.x;
+            pointer.prevY = pointer.y < 0 ? y : pointer.y;
+            pointer.x = x;
+            pointer.y = y;
+            pointer.active = true;
+
+            const dx = pointer.x - pointer.prevX;
+            const dy = pointer.y - pointer.prevY;
+            pointer.speed = Math.hypot(dx, dy);
+
+            bladeTrail.push({
+                x: pointer.x,
+                y: pointer.y,
+                life: 1.0
+            });
+            if (bladeTrail.length > 18) {
+                bladeTrail.shift();
+            }
+
+            if (gameState.isPlaying) {
+                checkBladeCollisions();
+            }
+        }
+
+        /**
+         * ============================================================================
+         * 8. LOGIKA INTI PERMAINAN (START MISI, SPAWN BUAH, BOM, BUBBLE BONUS)
+         * ============================================================================
+         */
+        function resizeCanvas() {
+            const container = document.getElementById('screen-game');
+            canvas.width = container.clientWidth || window.innerWidth;
+            canvas.height = container.clientHeight || (window.innerHeight - 64);
+        }
+
+        function startMission(missionIdx) {
+            initAudio();
+            gameState.currentMissionIdx = missionIdx;
+            gameState.currentQuestionIdx = 0;
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.correctCount = 0;
+            gameState.elapsedSeconds = 0;
+            gameState.scoreMultiplier = 1;
+            gameState.multiplierTimeLeft = 0;
+            gameState.bombTimer = 0;
+            gameState.bonusTimer = 0;
+            gameState.questionLocked = false;
+            gameState.isPlaying = true;
+
+            fruits = [];
+            slicedHalves = [];
+            bombs = [];
+            bonuses = [];
+            particles = [];
+            floatingTexts = [];
+            bladeTrail = [];
+            document.getElementById('hazard-warning-container').innerHTML = '';
+
+            showScreen('screen-game');
+            resizeCanvas();
+
+            // Jika pemain memilih mode kamera namun belum mengaktifkannya, aktifkan sekarang
+            if (gameState.controlMode === 'camera' && !cameraActive) {
+                activateWebcam();
+            }
+
+            updateHUD();
+            loadCurrentQuestion();
+
+            lastFrameTime = performance.now();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function loadCurrentQuestion() {
+            const mission = MISSIONS_DATA[gameState.currentMissionIdx];
+            const qObj = mission.questions[gameState.currentQuestionIdx];
+            gameState.questionLocked = false;
+
+            // Update UI Soal
+            document.getElementById('question-level-badge').textContent = qObj.type;
+            document.getElementById('question-number-label').textContent = 
+                `Pertanyaan ${gameState.currentQuestionIdx + 1} dari ${mission.questions.length}`;
+            document.getElementById('question-text').textContent = qObj.q;
+
+            updateHUD();
+            spawnQuestionFruits(qObj);
+        }
+
+        function spawnQuestionFruits(qObj) {
+            fruits = [];
+            // Acak urutan pilihan jawaban
+            const shuffledOpts = [...qObj.opts].sort(() => Math.random() - 0.5);
+            // Acak jenis buah
+            const shuffledFruitTypes = [...FRUIT_TYPES].sort(() => Math.random() - 0.5);
+
+            const count = shuffledOpts.length;
+            const marginX = Math.max(70, canvas.width * 0.14);
+            const usableWidth = Math.max(200, canvas.width - marginX * 2);
+            const stepX = usableWidth / (count - 1 || 1);
+
+            // Kecepatan jatuh perlahan dan sedikit meningkat seiring bertambahnya nomor soal
+            const speedBonus = gameState.currentQuestionIdx * 7;
+
+            shuffledOpts.forEach((val, idx) => {
+                const fType = shuffledFruitTypes[idx % shuffledFruitTypes.length];
+                const radius = Math.min(54, Math.max(40, canvas.width * 0.048));
+
+                fruits.push({
+                    x: marginX + stepX * idx + (Math.random() * 24 - 12),
+                    y: 125 + Math.random() * 45, // Muncul dari bagian atas di bawah papan soal
+                    vx: (Math.random() - 0.5) * 35,
+                    vy: 42 + speedBonus + Math.random() * 14, // Jatuh melayang perlahan
+                    swayPhase: Math.random() * Math.PI * 2,
+                    swaySpeed: 1.8 + Math.random() * 0.8,
+                    rotation: (Math.random() - 0.5) * 0.3,
+                    rotSpeed: (Math.random() - 0.5) * 0.8,
+                    radius: radius,
+                    value: val,
+                    isCorrect: val === qObj.ans,
+                    fruitType: fType,
+                    sliced: false
+                });
+            });
+        }
+
+        // Bom jatuh setiap 10 detik sekali
+        function spawnBomb() {
+            const margin = 80;
+            const x = margin + Math.random() * Math.max(100, canvas.width - margin * 2);
+            bombs.push({
+                x: x,
+                y: 120,
+                vx: (Math.random() - 0.5) * 45,
+                vy: 68 + Math.random() * 22,
+                swayPhase: Math.random() * Math.PI * 2,
+                radius: 36,
+                fuseAngle: 0,
+                exploded: false
+            });
+            showHazardToast("⚠️ Awas Bom Melayang!", "bg-rose-600/95 border-rose-300");
+        }
+
+        // Bubble Bonus muncul setiap 15 detik sekali
+        function spawnBonusBubble() {
+            const bonusTypes = [
+                { id: 'life', label: '+1 Nyawa', icon: '❤️', color: '#f43f5e' },
+                { id: 'x2', label: 'Skor 2x (5d)', icon: '⚡2X', color: '#f59e0b' },
+                { id: 'x3', label: 'Skor 3x (5d)', icon: '🔥3X', color: '#a855f7' },
+                { id: 'time', label: '-5d Waktu', icon: '⏱️-5s', color: '#06b6d4' }
+            ];
+            const chosen = bonusTypes[Math.floor(Math.random() * bonusTypes.length)];
+            const margin = 85;
+            const x = margin + Math.random() * Math.max(100, canvas.width - margin * 2);
+
+            bonuses.push({
+                x: x,
+                y: 120,
+                vx: (Math.random() - 0.5) * 35,
+                vy: 52 + Math.random() * 15,
+                swayPhase: Math.random() * Math.PI * 2,
+                radius: 40,
+                bonus: chosen,
+                collected: false
+            });
+            showHazardToast(`🫧 Bonus Muncul: ${chosen.label}!`, "bg-cyan-600/95 border-cyan-200");
+        }
+
+        function showHazardToast(text, colorClasses) {
+            const container = document.getElementById('hazard-warning-container');
+            const toast = document.createElement('div');
+            toast.className = `${colorClasses} border-2 text-white text-xs font-extrabold px-3 py-1.5 rounded-2xl shadow-lg animate-bounce`;
+            toast.textContent = text;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        /**
+         * ============================================================================
+         * 9. DETEKSI TABRAKAN PEDANG DENGAN BUAH, BOM, & BUBBLE BONUS
+         * ============================================================================
+         */
+        function checkBladeCollisions() {
+            const px = pointer.x;
+            const py = pointer.y;
+
+            // 1. Cek Tabrakan dengan Buah
+            if (!gameState.questionLocked) {
+                for (let i = 0; i < fruits.length; i++) {
+                    const f = fruits[i];
+                    if (f.sliced) continue;
+                    const dist = Math.hypot(px - f.x, py - f.y);
+                    if (dist <= f.radius + 14) {
+                        sliceFruit(f);
+                        break;
+                    }
+                }
+            }
+
+            // 2. Cek Tabrakan dengan Bom
+            for (let i = bombs.length - 1; i >= 0; i--) {
+                const b = bombs[i];
+                if (b.exploded) continue;
+                const dist = Math.hypot(px - b.x, py - b.y);
+                if (dist <= b.radius + 10) {
+                    triggerBombExplosion(b, i);
+                }
+            }
+
+            // 3. Cek Tabrakan dengan Bubble Bonus
+            for (let i = bonuses.length - 1; i >= 0; i--) {
+                const bub = bonuses[i];
+                if (bub.collected) continue;
+                const dist = Math.hypot(px - bub.x, py - bub.y);
+                if (dist <= bub.radius + 12) {
+                    collectBonusBubble(bub, i);
+                }
+            }
+        }
+
+        function sliceFruit(fruit) {
+            fruit.sliced = true;
+            gameState.questionLocked = true;
+            playSound('slice');
+
+            // Buat 2 belahan buah yang terbang terpisah
+            slicedHalves.push(
+                {
+                    x: fruit.x - 10, y: fruit.y,
+                    vx: -110 - Math.random() * 50, vy: -80,
+                    rotation: fruit.rotation, rotSpeed: -3.5,
+                    radius: fruit.radius, fruitType: fruit.fruitType, side: -1, alpha: 1
+                },
+                {
+                    x: fruit.x + 10, y: fruit.y,
+                    vx: 110 + Math.random() * 50, vy: -80,
+                    rotation: fruit.rotation, rotSpeed: 3.5,
+                    radius: fruit.radius, fruitType: fruit.fruitType, side: 1, alpha: 1
+                }
+            );
+
+            // Percikan partikel jus buah
+            createSplashParticles(fruit.x, fruit.y, fruit.fruitType.innerColor, 20);
+
+            if (fruit.isCorrect) {
+                // JAWABAN BENAR!
+                const pointsEarned = 20 * gameState.scoreMultiplier;
+                gameState.score += pointsEarned;
+                gameState.correctCount += 1;
+                playSound('correct');
+
+                showFeedbackBanner(`BENAR! +${pointsEarned} 🌟`, true);
+                addFloatingText(fruit.x, fruit.y - 20, `+${pointsEarned}`, '#4ade80');
+                updateHUD();
+
+                setTimeout(() => {
+                    if (!gameState.isPlaying) return;
+                    advanceToNextQuestion();
+                }, 950);
+            } else {
+                // JAWABAN SALAH!
+                gameState.lives -= 1;
+                playSound('wrong');
+                showFeedbackBanner(`KURANG TEPAT! (${fruit.value}) ❌`, false);
+                addFloatingText(fruit.x, fruit.y - 20, `-1 ❤️`, '#fb7185');
+                updateHUD();
+
+                if (gameState.lives <= 0) {
+                    setTimeout(() => finishMission(false), 900);
+                } else {
+                    // Munculkan ulang buah untuk soal yang sama agar siswa bisa mencoba lagi
+                    setTimeout(() => {
+                        if (!gameState.isPlaying) return;
+                        const mission = MISSIONS_DATA[gameState.currentMissionIdx];
+                        gameState.questionLocked = false;
+                        spawnQuestionFruits(mission.questions[gameState.currentQuestionIdx]);
+                    }, 950);
+                }
+            }
+        }
+
+        function triggerBombExplosion(bomb, index) {
+            bomb.exploded = true;
+            bombs.splice(index, 1);
+            playSound('bomb');
+
+            createSplashParticles(bomb.x, bomb.y, '#ff5400', 28);
+            createSplashParticles(bomb.x, bomb.y, '#ffd60a', 16);
+            addFloatingText(bomb.x, bomb.y - 15, 'BOOM! -1 ❤️', '#ef4444');
+            showFeedbackBanner('AWAS BOM! NYAWA -1 💥', false);
+
+            gameState.lives -= 1;
+            updateHUD();
+
+            if (gameState.lives <= 0) {
+                gameState.isPlaying = false;
+                setTimeout(() => finishMission(false), 800);
+            }
+        }
+
+        function collectBonusBubble(bub, index) {
+            bub.collected = true;
+            bonuses.splice(index, 1);
+            playSound('bonus');
+
+            createSplashParticles(bub.x, bub.y, bub.bonus.color, 22);
+            const bType = bub.bonus.id;
+
+            if (bType === 'life') {
+                gameState.lives = Math.min(gameState.maxLives, gameState.lives + 1);
+                addFloatingText(bub.x, bub.y, '+1 NYAWA ❤️', '#fb7185');
+            } else if (bType === 'x2') {
+                gameState.scoreMultiplier = 2;
+                gameState.multiplierTimeLeft = 5;
+                addFloatingText(bub.x, bub.y, 'SKOR 2X (5 DETIK)!', '#facc15');
+            } else if (bType === 'x3') {
+                gameState.scoreMultiplier = 3;
+                gameState.multiplierTimeLeft = 5;
+                addFloatingText(bub.x, bub.y, 'SKOR 3X (5 DETIK)!', '#c084fc');
+            } else if (bType === 'time') {
+                gameState.elapsedSeconds = Math.max(0, gameState.elapsedSeconds - 5);
+                addFloatingText(bub.x, bub.y, 'WAKTU -5 DETIK ⏱️', '#22d3ee');
+            }
+
+            updateHUD();
+        }
+
+        function advanceToNextQuestion() {
+            const mission = MISSIONS_DATA[gameState.currentMissionIdx];
+            if (gameState.currentQuestionIdx + 1 < mission.questions.length) {
+                gameState.currentQuestionIdx += 1;
+                loadCurrentQuestion();
+            } else {
+                finishMission(true);
+            }
+        }
+
+        function finishMission(isVictory) {
+            gameState.isPlaying = false;
+            const mission = MISSIONS_DATA[gameState.currentMissionIdx];
+
+            // Simpan skor ke Papan Skor Top 5
+            if (gameState.score > 0) {
+                saveScoreToLeaderboard(gameState.studentName, gameState.score, mission.title);
+            }
+
+            const resultEmoji = document.getElementById('result-emoji');
+            const resultTitle = document.getElementById('result-title');
+            const resultMessage = document.getElementById('result-message');
+            const nextBtn = document.getElementById('btn-next-mission');
+
+            if (isVictory) {
+                playSound('win');
+                resultEmoji.textContent = '🏆';
+                resultTitle.textContent = 'MISI BERHASIL!';
+                resultMessage.innerHTML = `Luar biasa, <strong class="text-yellow-300">Chef ${escapeHtml(gameState.studentName)}</strong>! Kamu berhasil menaklukkan <strong class="text-cyan-300">${mission.title}</strong> dengan keterampilan berhitung yang hebat!`;
+
+                // Buka misi berikutnya secara berurutan
+                if (mission.id === gameState.unlockedMission && gameState.unlockedMission < MISSIONS_DATA.length) {
+                    gameState.unlockedMission += 1;
+                    localStorage.setItem(STORAGE_KEYS.UNLOCKED_MISSION, String(gameState.unlockedMission));
+                }
+
+                if (gameState.currentMissionIdx + 1 < MISSIONS_DATA.length) {
+                    nextBtn.classList.remove('hidden');
+                } else {
+                    nextBtn.classList.add('hidden');
+                    resultMessage.innerHTML = `🎉 SELAMAT! <strong class="text-yellow-300">Chef ${escapeHtml(gameState.studentName)}</strong> telah menamatkan seluruh 5 Misi (50 Soal) Math Ninja! Kamu resmi menjadi Master Chef Matematika Kelas 2! 👨‍🍳👑`;
+                }
+            } else {
+                playSound('wrong');
+                resultEmoji.textContent = '💪';
+                resultTitle.textContent = 'AYO COBA LAGI!';
+                resultMessage.innerHTML = `Tetap semangat, <strong class="text-yellow-300">Chef ${escapeHtml(gameState.studentName)}</strong>! Jangan menyerah, ayo berlatih lagi untuk menaklukkan <strong class="text-cyan-300">${mission.title}</strong>!`;
+                nextBtn.classList.add('hidden');
+            }
+
+            document.getElementById('result-score').textContent = gameState.score;
+            document.getElementById('result-correct').textContent = `${gameState.correctCount}/${mission.questions.length}`;
+            document.getElementById('result-time').textContent = formatTime(gameState.elapsedSeconds);
+
+            showScreen('screen-result');
+        }
+
+        function playNextMission() {
+            if (gameState.currentMissionIdx + 1 < MISSIONS_DATA.length) {
+                startMission(gameState.currentMissionIdx + 1);
+            }
+        }
+
+        function replayCurrentMission() {
+            startMission(gameState.currentMissionIdx);
+        }
+
+        /**
+         * ============================================================================
+         * 10. UPDATE HUD & UMPAN BALIK VISUAL
+         * ============================================================================
+         */
+        function updateHUD() {
+            const mission = MISSIONS_DATA[gameState.currentMissionIdx];
+            document.getElementById('hud-progress').textContent = `M${mission.id} • ${gameState.currentQuestionIdx + 1}/10`;
+            document.getElementById('hud-lives').textContent = '❤️'.repeat(Math.max(0, gameState.lives)) || '💔';
+            document.getElementById('hud-score').textContent = gameState.score;
+            document.getElementById('hud-timer').textContent = formatTime(gameState.elapsedSeconds);
+
+            const multEl = document.getElementById('hud-multiplier');
+            if (gameState.scoreMultiplier > 1) {
+                multEl.textContent = `${gameState.scoreMultiplier}X (${Math.ceil(gameState.multiplierTimeLeft)}d)`;
+                multEl.classList.remove('hidden');
+            } else {
+                multEl.classList.add('hidden');
+            }
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60).toString().padStart(2, '0');
+            const s = Math.floor(sec % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        let feedbackTimeout = null;
+        function showFeedbackBanner(text, isSuccess) {
+            const banner = document.getElementById('feedback-banner');
+            const badge = document.getElementById('feedback-badge');
+            badge.textContent = text;
+            badge.className = isSuccess
+                ? "px-6 py-3 rounded-3xl font-arcade text-sm sm:text-xl border-4 border-emerald-200 bg-emerald-500 text-slate-950 shadow-2xl"
+                : "px-6 py-3 rounded-3xl font-arcade text-sm sm:text-xl border-4 border-rose-200 bg-rose-600 text-white shadow-2xl";
+
+            banner.classList.remove('hidden');
+            clearTimeout(feedbackTimeout);
+            feedbackTimeout = setTimeout(() => {
+                banner.classList.add('hidden');
+            }, 850);
+        }
+
+        function createSplashParticles(x, y, color, count) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 60 + Math.random() * 210;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    radius: 4 + Math.random() * 6,
+                    color: color,
+                    alpha: 1,
+                    decay: 1.4 + Math.random() * 0.8
+                });
+            }
+        }
+
+        function addFloatingText(x, y, text, color) {
+            floatingTexts.push({
+                x: x,
+                y: y,
+                text: text,
+                color: color,
+                alpha: 1,
+                vy: -55
+            });
+        }
+
+        /**
+         * ============================================================================
+         * 11. GAME LOOP & RENDERING GRAFIK BUAH REALISTIS, BOM, BONUS, & PEDANG
+         * ============================================================================
+         */
+        function gameLoop(timestamp) {
+            if (!gameState.isPlaying) return;
+
+            const dt = Math.min(0.05, (timestamp - lastFrameTime) / 1000);
+            lastFrameTime = timestamp;
+
+            updateGameLogic(dt);
+            renderGameCanvas();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function updateGameLogic(dt) {
+            // Update Timer Detik & Multiplier
+            secondAccumulator += dt;
+            if (secondAccumulator >= 1) {
+                gameState.elapsedSeconds += 1;
+                secondAccumulator -= 1;
+                updateHUD();
+            }
+
+            if (gameState.scoreMultiplier > 1) {
+                gameState.multiplierTimeLeft -= dt;
+                if (gameState.multiplierTimeLeft <= 0) {
+                    gameState.scoreMultiplier = 1;
+                    gameState.multiplierTimeLeft = 0;
+                    updateHUD();
+                }
+            }
+
+            // Timer Spawn Bom setiap 10 detik
+            gameState.bombTimer += dt;
+            if (gameState.bombTimer >= 10) {
+                gameState.bombTimer = 0;
+                spawnBomb();
+            }
+
+            // Timer Spawn Bubble Bonus setiap 15 detik
+            gameState.bonusTimer += dt;
+            if (gameState.bonusTimer >= 15) {
+                gameState.bonusTimer = 0;
+                spawnBonusBubble();
+            }
+
+            // Update Buah melayang jatuh perlahan
+            let allOutOfBounds = fruits.length > 0;
+            fruits.forEach(f => {
+                if (f.sliced) return;
+                f.swayPhase += f.swaySpeed * dt;
+                f.x += f.vx * dt + Math.sin(f.swayPhase) * 28 * dt;
+                f.y += f.vy * dt;
+                f.rotation += f.rotSpeed * dt;
+
+                // Pantulkan halus jika menyentuh tepi kiri/kanan layar
+                if (f.x < f.radius + 16) {
+                    f.x = f.radius + 16;
+                    f.vx = Math.abs(f.vx);
+                } else if (f.x > canvas.width - f.radius - 16) {
+                    f.x = canvas.width - f.radius - 16;
+                    f.vx = -Math.abs(f.vx);
+                }
+
+                if (f.y < canvas.height + f.radius) {
+                    allOutOfBounds = false;
+                }
+            });
+
+            // Jika semua buah jatuh melewati bawah layar tanpa terpotong, munculkan kembali buah soal ini
+            if (!gameState.questionLocked && allOutOfBounds) {
+                const mission = MISSIONS_DATA[gameState.currentMissionIdx];
+                spawnQuestionFruits(mission.questions[gameState.currentQuestionIdx]);
+            }
+
+            // Update Belahan Buah Terpotong
+            for (let i = slicedHalves.length - 1; i >= 0; i--) {
+                const h = slicedHalves[i];
+                h.x += h.vx * dt;
+                h.y += h.vy * dt;
+                h.vy += 360 * dt; // Gravitasi belahan
+                h.rotation += h.rotSpeed * dt;
+                h.alpha -= 1.1 * dt;
+                if (h.alpha <= 0) slicedHalves.splice(i, 1);
+            }
+
+            // Update Bom
+            for (let i = bombs.length - 1; i >= 0; i--) {
+                const b = bombs[i];
+                b.swayPhase += 2.2 * dt;
+                b.x += b.vx * dt + Math.sin(b.swayPhase) * 35 * dt;
+                b.y += b.vy * dt;
+                b.fuseAngle += 8 * dt;
+                if (b.y > canvas.height + 60) {
+                    bombs.splice(i, 1);
+                }
+            }
+
+            // Update Bubble Bonus
+            for (let i = bonuses.length - 1; i >= 0; i--) {
+                const bub = bonuses[i];
+                bub.swayPhase += 2.0 * dt;
+                bub.x += bub.vx * dt + Math.cos(bub.swayPhase) * 30 * dt;
+                bub.y += bub.vy * dt;
+                if (bub.y > canvas.height + 60) {
+                    bonuses.splice(i, 1);
+                }
+            }
+
+            // Update Partikel
+            for (let i = particles.length - 1; i >= 0; i--) {
+                const p = particles[i];
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.vy += 240 * dt;
+                p.alpha -= p.decay * dt;
+                if (p.alpha <= 0) particles.splice(i, 1);
+            }
+
+            // Update Teks Melayang
+            for (let i = floatingTexts.length - 1; i >= 0; i--) {
+                const ft = floatingTexts[i];
+                ft.y += ft.vy * dt;
+                ft.alpha -= 1.0 * dt;
+                if (ft.alpha <= 0) floatingTexts.splice(i, 1);
+            }
+
+            // Update Jejak Pedang
+            for (let i = bladeTrail.length - 1; i >= 0; i--) {
+                bladeTrail[i].life -= 4.5 * dt;
+                if (bladeTrail[i].life <= 0) {
+                    bladeTrail.splice(i, 1);
+                }
+            }
+        }
+
+        function renderGameCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 0. Gambar Tekstur Talenan Kayu Coklat (Serat kayu, papan sambung & goresan pisau halus)
+            drawWoodenBoardBackground();
+
+            // 1. Gambar Bubble Bonus
+            bonuses.forEach(bub => drawBonusBubble(bub));
+
+            // 2. Gambar Bom
+            bombs.forEach(b => drawBomb(b));
+
+            // 3. Gambar Buah Utuh + Angka Jawaban
+            fruits.forEach(f => {
+                if (!f.sliced) drawRealisticFruit(f);
+            });
+
+            // 4. Gambar Belahan Buah Terpotong
+            slicedHalves.forEach(h => drawSlicedHalf(h));
+
+            // 5. Gambar Partikel Percikan
+            particles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, p.alpha);
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+
+            // 6. Gambar Teks Skor Melayang
+            floatingTexts.forEach(ft => {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, ft.alpha);
+                ctx.font = "bold 24px 'Fredoka', sans-serif";
+                ctx.textAlign = "center";
+                ctx.lineWidth = 4;
+                ctx.strokeStyle = "#0f172a";
+                ctx.strokeText(ft.text, ft.x, ft.y);
+                ctx.fillStyle = ft.color;
+                ctx.fillText(ft.text, ft.x, ft.y);
+                ctx.restore();
+            });
+
+            // 7. Gambar Jejak Cahaya Pedang & Kursor Telunjuk/Telapak
+            drawBladeTrail();
+        }
+
+        /**
+         * Menggambar Detail Talenan Kayu Coklat Realistis di Canvas
+         */
+        function drawWoodenBoardBackground() {
+            const w = canvas.width;
+            const h = canvas.height;
+
+            ctx.save();
+            // Bingkai talenan kayu gelap di tepi arena
+            ctx.strokeStyle = "rgba(56, 26, 8, 0.75)";
+            ctx.lineWidth = 18;
+            ctx.strokeRect(9, 9, w - 18, h - 18);
+
+            // Garis sambungan bilah kayu horizontal halus
+            ctx.strokeStyle = "rgba(48, 22, 6, 0.25)";
+            ctx.lineWidth = 2;
+            const plankHeight = 90;
+            for (let y = plankHeight; y < h; y += plankHeight) {
+                ctx.beginPath();
+                ctx.moveTo(16, y);
+                ctx.lineTo(w - 16, y);
+                ctx.stroke();
+            }
+
+            // Goresan pisau tipis di tengah talenan sebagai aksen dapur chef
+            ctx.strokeStyle = "rgba(255, 228, 196, 0.12)";
+            ctx.lineWidth = 1.5;
+            const cx = w * 0.5;
+            const cy = h * 0.56;
+            const scratches = [
+                [-120, -25, 110, 15],
+                [-80, 35, 95, -20],
+                [-140, 10, 60, 45],
+                [40, -40, 130, 25]
+            ];
+            scratches.forEach(([x1, y1, x2, y2]) => {
+                ctx.beginPath();
+                ctx.moveTo(cx + x1, cy + y1);
+                ctx.lineTo(cx + x2, cy + y2);
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+
+        /**
+         * Menggambar Buah Realistis Bertekstur (Apel, Nanas, Jeruk, Kiwi, Pisang, Semangka)
+         */
+        function drawRealisticFruit(f) {
+            ctx.save();
+            ctx.translate(f.x, f.y);
+
+            // Bayangan lembut di bawah buah
+            ctx.beginPath();
+            ctx.arc(4, 8, f.radius, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(0, 0, 0, 0.32)";
+            ctx.fill();
+
+            ctx.save();
+            ctx.rotate(f.rotation);
+
+            const r = f.radius;
+            const type = f.fruitType.id;
+
+            // Daun mahkota di atas buah
+            ctx.fillStyle = f.fruitType.leafColor;
+            ctx.beginPath();
+            ctx.ellipse(0, -r - 4, 12, 6, -0.3, 0, Math.PI * 2);
+            ctx.ellipse(8, -r - 3, 10, 5, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Badan Buah Utama dengan Gradien 3D
+            const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, r * 0.1, 0, 0, r);
+            if (type === 'apel') {
+                grad.addColorStop(0, '#ff8fa3');
+                grad.addColorStop(0.5, '#ef233c');
+                grad.addColorStop(1, '#8d0801');
+            } else if (type === 'jeruk') {
+                grad.addColorStop(0, '#ffd166');
+                grad.addColorStop(0.55, '#f77f00');
+                grad.addColorStop(1, '#d62828');
+            } else if (type === 'nanas') {
+                grad.addColorStop(0, '#fef08a');
+                grad.addColorStop(0.6, '#eab308');
+                grad.addColorStop(1, '#a16207');
+            } else if (type === 'kiwi') {
+                grad.addColorStop(0, '#d9f99d');
+                grad.addColorStop(0.65, '#65a30d');
+                grad.addColorStop(1, '#713f12');
+            } else if (type === 'pisang') {
+                grad.addColorStop(0, '#fef9c3');
+                grad.addColorStop(0.6, '#facc15');
+                grad.addColorStop(1, '#ca8a04');
+            } else {
+                // Semangka
+                grad.addColorStop(0, '#86efac');
+                grad.addColorStop(0.6, '#16a34a');
+                grad.addColorStop(1, '#14532d');
+            }
+
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+
+            // Detail tekstur spesifik per buah
+            if (type === 'kiwi') {
+                // Kulit coklat luar & biji hitam melingkar
+                ctx.lineWidth = 5;
+                ctx.strokeStyle = '#78350f';
+                ctx.stroke();
+                ctx.fillStyle = '#fefce8';
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 0.42, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#1c1917';
+                for (let a = 0; a < Math.PI * 2; a += Math.PI / 6) {
+                    ctx.beginPath();
+                    ctx.arc(Math.cos(a) * r * 0.56, Math.sin(a) * r * 0.56, 2.2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else if (type === 'nanas') {
+                // Pola sisik nanas menyilang
+                ctx.strokeStyle = 'rgba(146, 64, 14, 0.35)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(-r * 0.6, -r * 0.3); ctx.lineTo(r * 0.6, r * 0.3);
+                ctx.moveTo(-r * 0.6, r * 0.3); ctx.lineTo(r * 0.6, -r * 0.3);
+                ctx.stroke();
+            } else if (type === 'semangka') {
+                // Garis loreng semangka
+                ctx.strokeStyle = '#052e16';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                ctx.arc(0, 0, r * 0.72, -0.8, 0.8);
+                ctx.stroke();
+            }
+
+            // Kilau Glossy Realistis
+            ctx.beginPath();
+            ctx.ellipse(-r * 0.32, -r * 0.32, r * 0.24, r * 0.13, -0.6, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.48)";
+            ctx.fill();
+
+            ctx.restore();
+
+            // Lingkaran Latar Angka Jawaban agar sangat kontras dan mudah dibaca anak
+            ctx.beginPath();
+            ctx.arc(0, 2, r * 0.62, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(15, 23, 42, 0.84)";
+            ctx.fill();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = "#fde047";
+            ctx.stroke();
+
+            // Teks Angka Pilihan Jawaban
+            ctx.font = `bold ${Math.round(r * 0.58)}px 'Fredoka', sans-serif`;
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText(String(f.value), 0, 3);
+
+            ctx.restore();
+        }
+
+        function drawSlicedHalf(h) {
+            ctx.save();
+            ctx.globalAlpha = Math.max(0, h.alpha);
+            ctx.translate(h.x, h.y);
+            ctx.rotate(h.rotation);
+
+            const r = h.radius;
+            const startAngle = h.side < 0 ? Math.PI * 0.5 : -Math.PI * 0.5;
+            const endAngle = h.side < 0 ? Math.PI * 1.5 : Math.PI * 0.5;
+
+            // Kulit luar setengah lingkaran
+            ctx.beginPath();
+            ctx.arc(0, 0, r, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = h.fruitType.mainColor;
+            ctx.fill();
+
+            // Daging buah bagian dalam
+            ctx.beginPath();
+            ctx.arc(0, 0, r * 0.84, startAngle, endAngle);
+            ctx.closePath();
+            ctx.fillStyle = h.fruitType.innerColor;
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawBomb(b) {
+            ctx.save();
+            ctx.translate(b.x, b.y);
+
+            // Aura peringatan merah berdenyut
+            const pulse = 1 + Math.sin(b.fuseAngle * 1.5) * 0.1;
+            ctx.beginPath();
+            ctx.arc(0, 0, b.radius * 1.22 * pulse, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(239, 68, 68, 0.22)";
+            ctx.fill();
+
+            // Sumbu bom
+            ctx.beginPath();
+            ctx.moveTo(0, -b.radius + 4);
+            ctx.quadraticCurveTo(12, -b.radius - 14, 20, -b.radius - 8);
+            ctx.lineWidth = 4;
+            ctx.strokeStyle = "#d97706";
+            ctx.stroke();
+
+            // Percikan api di ujung sumbu
+            ctx.beginPath();
+            ctx.arc(20, -b.radius - 8, 5 + Math.sin(b.fuseAngle * 3) * 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = "#fde047";
+            ctx.fill();
+
+            // Badan bom logam hitam
+            const grad = ctx.createRadialGradient(-10, -10, 4, 0, 0, b.radius);
+            grad.addColorStop(0, '#64748b');
+            grad.addColorStop(0.5, '#1e293b');
+            grad.addColorStop(1, '#020617');
+
+            ctx.beginPath();
+            ctx.arc(0, 0, b.radius, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = "#ef4444";
+            ctx.stroke();
+
+            // Ikon Tengkorak / Bahaya
+            ctx.font = "26px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("💣", 0, 2);
+
+            ctx.restore();
+        }
+
+        function drawBonusBubble(bub) {
+            ctx.save();
+            ctx.translate(bub.x, bub.y);
+
+            const r = bub.radius;
+            // Gelembung transparan pelangi
+            const grad = ctx.createRadialGradient(-r * 0.3, -r * 0.3, 4, 0, 0, r);
+            grad.addColorStop(0, "rgba(255, 255, 255, 0.85)");
+            grad.addColorStop(0.5, "rgba(56, 189, 248, 0.35)");
+            grad.addColorStop(1, bub.bonus.color);
+
+            ctx.beginPath();
+            ctx.arc(0, 0, r, 0, Math.PI * 2);
+            ctx.fillStyle = grad;
+            ctx.fill();
+            ctx.lineWidth = 3;
+            ctx.strokeStyle = "#ffffff";
+            ctx.stroke();
+
+            // Kilau gelembung
+            ctx.beginPath();
+            ctx.arc(-r * 0.35, -r * 0.35, r * 0.2, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.fill();
+
+            // Ikon & Label Bonus
+            ctx.font = "bold 16px 'Fredoka', sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillStyle = "#ffffff";
+            ctx.fillText(bub.bonus.icon, 0, -4);
+
+            ctx.font = "bold 10px 'Fredoka', sans-serif";
+            ctx.fillText(bub.bonus.label, 0, 14);
+
+            ctx.restore();
+        }
+
+        function drawBladeTrail() {
+            if (bladeTrail.length > 1) {
+                for (let i = 1; i < bladeTrail.length; i++) {
+                    const p1 = bladeTrail[i - 1];
+                    const p2 = bladeTrail[i];
+
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.lineWidth = p2.life * 14;
+                    ctx.lineCap = "round";
+                    ctx.strokeStyle = `rgba(0, 245, 212, ${p2.life * 0.85})`;
+                    ctx.shadowColor = "#00bbf9";
+                    ctx.shadowBlur = 16;
+                    ctx.stroke();
+
+                    // Inti cahaya putih pedang
+                    ctx.beginPath();
+                    ctx.moveTo(p1.x, p1.y);
+                    ctx.lineTo(p2.x, p2.y);
+                    ctx.lineWidth = p2.life * 5;
+                    ctx.lineCap = "round";
+                    ctx.strokeStyle = `rgba(255, 255, 255, ${p2.life})`;
+                    ctx.stroke();
+                    ctx.restore();
+                }
+            }
+
+            // Kursor Ujung Pedang
+            if (pointer.active && pointer.x >= 0 && pointer.y >= 0) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(pointer.x, pointer.y, 10, 0, Math.PI * 2);
+                ctx.fillStyle = "#ffffff";
+                ctx.shadowColor = "#00f5d4";
+                ctx.shadowBlur = 18;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        // Jalankan inisialisasi saat halaman selesai dimuat
+        window.onload = initApp;
+    </script>
+</body>
+</html>
